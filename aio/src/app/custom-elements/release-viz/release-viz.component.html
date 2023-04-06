@@ -1,0 +1,98 @@
+<div [hidden]="true">
+  <ng-content #template></ng-content>
+</div>
+
+<div>
+  <div class="rv-table"
+    *ngFor="let keys of [svg.releaseCollection.lines[0].keys]"
+  >
+    <div class="rv-table-head">
+      <div class="rv-table-column"
+        *ngFor="let key of keys"
+        [ngStyle]="{'width': 100/keys.length + '%'}"
+      >
+        {{key}}
+      </div>
+    </div>
+
+    <div class="rv-table-row" *ngFor="let release of svg.releaseCollection.releases">
+
+      <div class="rv-table-column"
+        *ngFor="let key of keys; index as i"
+        [ngStyle]="{'width': 100/keys.length + '%'}"
+      >
+        <div *ngIf="i === 0" [ngClass]="{
+            'rv-active': release.isActive(),
+            'rv-unsupported': release.isUnsupported(),
+            'rv-future': release.isFuture(),
+            'rv-lts': release.isLTS()
+          }"
+        >
+          {{ release.version }}
+        </div>
+        <div *ngIf="i !== 0">
+          {{ release.getKey(key) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rv-container" #svgContainer>
+
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+
+      [attr.width]="svg.overallWidth"
+      [attr.height]="svg.overallHeight"
+    >
+
+      <g
+        *ngFor="let group of renderGroups"
+        [attr.transform]="'translate(' + group.translatePoints.join(',') + ')'"
+      >
+        <g
+          *ngFor="let child of group.children"
+        >
+          <text
+            class="{{child.cssClass}}"
+
+            *ngIf="child.type === 'text'"
+            [attr.x]="child.x"
+            [attr.y]="child.y"
+          >
+            {{ child.text }}
+          </text>
+
+          <rect
+            class="{{child.cssClass}}"
+
+            *ngIf="child.type === 'rect'"
+            [attr.width]="child.width"
+            [attr.height]="child.height"
+            [attr.x]="child.x"
+            [attr.y]="child.y"
+            [attr.rx]="child.rx"
+          >
+            {{ child.body }}
+          </rect>
+
+          <line
+            class="{{child.cssClass}}"
+
+            *ngIf="child.type === 'line'"
+            [attr.x1]="child.x1"
+            [attr.y1]="child.y1"
+            [attr.x2]="child.x2"
+            [attr.y2]="child.y2"
+            [attr.stroke-dasharray]="child.dashed ? 5: ''"
+            [attr.data-some]="child.someData"
+          >
+          </line>
+
+        </g>
+      </g>
+
+    </svg>
+    
+  </div>
+</div>
